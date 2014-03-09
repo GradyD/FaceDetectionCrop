@@ -4,9 +4,9 @@ This is a python script that reads in images (.jpg and .png) finds a single face
 
 Planned Features
 =============
-		* Add capture from Webcam
-		* Add auto crop from Webcam
+* Add capture from Webcam
+* Add auto crop from Webcam
 		
 Currently working on
 ==================
-		* Add capture from Webcam 
+* Add capture from Webcam 
