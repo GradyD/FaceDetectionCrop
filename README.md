@@ -14,5 +14,7 @@ Currently working on
 Versions
 ==================
 1.0 - crop local images
-1.2.5 - code fixes and cleanup 
+
+1.3 - code fixes and cleanup 
+
 1.5 - Created working webcam function
