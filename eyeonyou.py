@@ -19,7 +19,7 @@ import os
 # Static
 faceCascade = cv.Load('haarcascade_frontalface_alt.xml')
 padding = -1
-DOWNSCALE = 4
+
 
 inputimg = raw_input('Please enter the entire path to the image folder:')
 outputimg = raw_input('Please enter the entire path to the output folder:')
@@ -32,29 +32,8 @@ while (padding < 0):
 capture = cv2.VideoCapture(0)
 cv2.namedWindow("Face Crop")
 if capture.isOpened():
-    rval, frame = capture.read()
-else:
-    rval = False
+    frame = capture.read()
 
-while rval:
-    # detect faces and draw bounding boxes
-    minisize = (frame.shape[1]/DOWNSCALE,frame.shape[0]/DOWNSCALE)
-    '''
-    for f in faces:
-        x, y, w, h = [ v*DOWNSCALE for v in f ]
-        cv2.rectangle(frame, (x,y), (x+w,y+h), (0,0,255))
-    cv.Flip(frame, None, 1) 
-    cv2.putText(frame, "Press ESC to close.", (5, 25),
-                cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255,255,255))
-    cv2.imshow("preview", frame)
- 
-    # get next frame
-    rval, frame = capture.read()
- 
-    key = cv2.waitKey(10)
-    if key in [27, ord('Q'), ord('q')]: # exit on ESC
-        break
-    '''
 def DetectFace(image, faceCascade, returnImage=False):
 
     #variables    
@@ -62,6 +41,7 @@ def DetectFace(image, faceCascade, returnImage=False):
     haar_scale = 1.1
     min_neighbors = 3
     haar_flags = 0
+    DOWNSCALE = 4
 
     # Equalize the histogram
     cv.EqualizeHist(image, image)
@@ -76,14 +56,23 @@ def DetectFace(image, faceCascade, returnImage=False):
             pt1 = (int(x), int(y))
             pt2 = (int(x + w), int(y + h))
             cv.Rectangle(image, pt1, pt2, cv.RGB(255, 0, 0), 5, 8, 0)
-            cv.Flip(frame, None, 1)
+
+						# Start video frame
+            minisize = (frame.shape[1]/DOWNSCALE,frame.shape[0]/DOWNSCALE)
+            miniframe = cv2.resize(frame, minisize)
+            faceCam = classifier.detectMultiScale(miniframe)
+            for f in faceCam:
+                x, y, w, h = [ v*DOWNSCALE for v in f ]
+                cv2.rectangle(frame, (x,y), (x+w,y+h), (0,0,255))
+         
             cv2.putText(frame, "Press ESC to close.", (5, 25),
-                cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255,255,255))
+            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255,255,255))
             cv2.imshow("preview", frame)
+         
             # get next frame
-            rval, frame = capture.read()
-            
-            key = cv2.waitKey(10)
+            frame = capture.read()         
+            raw_input('Pause for testing')
+            key = cv2.waitKey(20)
             if key in [27, ord('Q'), ord('q')]: # exit on ESC
                 break
 
@@ -97,10 +86,6 @@ def pil2cvGrey(pil_im):
     cv_im = cv.CreateImageHeader(pil_im.size, cv.IPL_DEPTH_8U, 1)
     cv.SetData(cv_im, pil_im.tostring(), pil_im.size[0]  )
     return cv_im
-
-def cv2pil(cv_im):
-    # Convert the cv image to a PIL image
-    return Image.fromstring("L", cv.GetSize(cv_im), cv_im.tostring())
 
 def imgCrop(image, cropBox, boxScale=1):
     # Crop a PIL image with the provided box [x(left), y(upper), w(width), h(height)]
@@ -129,9 +114,9 @@ def Crop(imagePattern,boxScale=1):
 									croppedImage=imgCrop(pil_im, face[0],boxScale=boxScale)
 									fname,ext=os.path.splitext(img)
 									fname = os.path.basename(fname)
-									print 'Cropping:', fname
 									croppedImage.save(outputimg + '\\' + fname + ' -c' + ext)
 									n+=1
+							print 'Cropping:', fname
 					else:
 							print 'No faces found:', img
 
