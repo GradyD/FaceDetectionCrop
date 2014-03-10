@@ -1,15 +1,11 @@
 EyeonYou
 ==========
-This is a python script that reads in images (.jpg and .png) finds a single face within the image and crops a square based upon the padding number supplied. It then saves the cropped image in the specified output folder. 
+This is a python script that is created to crop images based facial recognition. It has two options, create from webcam or 
+from saved image (jpg or png). It uses OpenCV to find the face and PIP to crop the image. 
 
-Planned Features
+Known bugs
 =============
-* Add capture from Webcam
-* Add auto crop from Webcam
-		
-Currently working on
-==================
-* Add capture from Webcam 
+* Display cropped imaage does not work correctly
 
 Versions
 ==================
@@ -18,3 +14,5 @@ Versions
 1.3 - code fixes and cleanup 
 
 1.5 - Created working webcam function
+
+2.0 - Created working save and crop from webcam
