@@ -5,7 +5,7 @@ from saved image (jpg or png). It uses OpenCV to find the face and PIP to crop t
 
 Known bugs
 =============
-* Display cropped imaage does not work correctly
+* Display cropped image does not work correctly
 
 Versions
 ==================
