@@ -16,3 +16,5 @@ Versions
 1.5 - Created working webcam function
 
 2.0 - Created working save and crop from webcam
+
+2.1 - Correct formatting, removed display copped image, fixed no faces found bug
