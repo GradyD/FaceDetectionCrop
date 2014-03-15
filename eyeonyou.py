@@ -1,5 +1,5 @@
 '''
-Version 2.1
+Version 2.1.6
 
 Modified by:
 ........-Grady Duncan, @aDroidman
@@ -16,9 +16,8 @@ import Image
 import glob
 import os
 import time
-import urllib
 
-print 'Version: 2.1'
+print 'Version: 2.1.6'
 
 # Static
 faceCascade = cv.Load('haarcascade_frontalface_alt.xml')
@@ -28,9 +27,6 @@ boxScale = 1
 # Needed for webcam CV2 section
 HaarXML = 'haarcascade_frontalface_alt.xml'
 classifier = cv2.CascadeClassifier(HaarXML)
-downScale = 4
-webcamIndex = int(raw_input('Please enter Camera Index (0, 1, 2): '))
-webcam = cv2.VideoCapture(webcamIndex)
 
 def DetectFace(image, faceCascade, returnImage=False):
 
@@ -67,7 +63,7 @@ def pil2cvGrey(pil_im):
     cv.SetData(cv_im, pil_im.tostring(), pil_im.size[0])
     return cv_im
 
-def imgCrop(image, cropBox, padding, boxScale=1):
+def imgCrop(image, cropBox, padding):
 
     # Crop a PIL image with the provided box [x(left), y(upper), w(width), h(height)]
     # Calculate scale factors
@@ -78,63 +74,79 @@ def imgCrop(image, cropBox, padding, boxScale=1):
     PIL_box = [cropBox[0] - xPadding, cropBox[1] - yPadding, cropBox[0] + cropBox[2] + xPadding, cropBox[1] + cropBox[3] + yPadding]
 
     return image.crop(PIL_box)
-
-def Crop(imagePattern, boxScale, outputimg, padding):
-    happy = True
-    imgList = glob.glob(imagePattern)
-    while happy:
-        if len(imgList) <= 0:
-            return
-        else:
-            for img in imgList:
-                pil_im = Image.open(img)
-                cv_im = pil2cvGrey(pil_im)
-                faces = DetectFace(cv_im, faceCascade)
-                if faces:
-                    n = 1
-                    for face in faces:
-                        croppedImage = imgCrop(pil_im, face[0], padding, boxScale=boxScale)
-                        (fname, ext) = os.path.splitext(img)
-                        fname = os.path.basename(fname)
-                        croppedImage.save(outputimg + '\\' + fname + ' -c' + ext)
-                        n += 1
-                    print 'Cropping:', fname
-                    check = True
-                else:
-                    print 'No faces found:', img
-                    check = False
-                    happy = False
-                    
-                            # Verify image
-                            # savedPath = outputimg + '\\' + fname + ' -c' + ext
-                            # verify = cv2.imread(savedPath, 0)
-                            # cv2.imshow('Saved Image', verify)
-                while check:
-                    print 'Please open the file manually to view for now'
-                    print 'Are you happy with the final crop?'
-                    happyTest = raw_input('Enter y or n: ')
-                    happyTest = happyTest.strip()
-                    if happyTest == 'y':
-                        happy = False
-                    elif happyTest == 'n':
-                        padding = int(raw_input('Enter crop padding:'))
-                    else:
-                        print 'Not a valid input'
+    
+def webCrop():
+    # Verify image
+    # savedPath = outputimg + '\\' + fname + ' -c' + ext
+    # verify = cv2.imread(savedPath, 0)
+    # cv2.imshow('Saved Image', verify)
+    print 'Please open the file manually to check crop.'
+    print 'Are you happy with the final crop?'
+    finalCheck = raw_input('Enter y or n: ')
+    if finalCheck == 'y':
+        check = False
+    elif finalCheck == 'n':
+        padding = int(raw_input('Enter crop padding: '))
+    else:
+        print 'Not a valid input'
     print 'Do you have more pictures to take?'
     again = raw_input('Enter y or n: ')
     if again == 'y':
-        Webcam(webcam, padding, boxScale)
+        WebcamConfig(padding)
     else:
         print 'Closing application'
-        time.sleep(3)
+        time.sleep(1)
         raise SystemExit
 
-def CropSetup(padding, boxScale):
+def Crop(imagePattern, outputimg, padding, check):
+    imgList = glob.glob(imagePattern)
+    if len(imgList) <= 0:
+        return
+    else:
+        # Crop images
+        for img in imgList:
+            pil_im = Image.open(img)
+            cv_im = pil2cvGrey(pil_im)
+            faces = DetectFace(cv_im, faceCascade)
+            if faces:
+                n = 1
+                for face in faces:
+                    croppedImage = imgCrop(pil_im, face[0], padding)
+                    (fname, ext) = os.path.splitext(img)
+                    fname = os.path.basename(fname)
+                    croppedImage.save(outputimg + '\\' + fname + ' -c' + ext)
+                    n += 1
+                print 'Cropping:', fname
+            else:
+                print 'No faces found:', img
+                print 'Closing application'
+                time.sleep(1)
+                raise SystemExit
+    # Send only if capturing from webcam            
+    if check:
+        webcrop()
+
+def CropSetup(padding, check):
     inputimg = raw_input('Please enter the entire path to the image folder:')
 
     # Input folder check
     if not os.path.exists(inputimg):
         print 'Input Folder not found'
+    outputimg = raw_input('Please enter the entire path to the output folder:')
+
+    # Create output folder if missing
+    if not os.path.exists(outputimg):
+        os.makedirs(outputimg)
+
+    # Get padding for crop
+    while padding < 0:
+        padding = int(raw_input('Enter crop padding:'))
+
+    # Sent to Crop function
+    Crop(inputimg + '\*.png', outputimg, padding, check)
+    Crop(inputimg + '\*.jpg', outputimg, padding, check)
+
+def WebCrop(name, padding):
     print 'Output Folder does not need to be created'
     outputimg = raw_input('Please enter the entire path to the output folder:')
 
@@ -146,32 +158,19 @@ def CropSetup(padding, boxScale):
     while padding < 0:
         padding = int(raw_input('Enter crop padding:'))
 
-    # Crop images
-    Crop(inputimg + '\*.png', boxScale, outputimg, padding)
-    Crop(inputimg + '\*.jpg', boxScale, outputimg)
+    Crop(name, outputimg, padding, check)
 
-def WebCrop(name, padding, boxScale):
-    print 'Output Folder does not need to be created'
-    outputimg = raw_input('Please enter the entire path to the output folder:')
-
-    # Create output folder if missing
-    if not os.path.exists(outputimg):
-        os.makedirs(outputimg)
-
-    # Get padding for crop
-    while padding < 0:
-        padding = int(raw_input('Enter crop padding:'))
-
-    Crop(name, boxScale, outputimg, padding)
-
-def Webcam(webcam, padding, boxScale):
+def WebcamConfig(padding, check):
+    webcamIndex = int(raw_input('Please enter Camera Index (0, 1, 2): '))
+    webcam = cv2.VideoCapture(webcamIndex)
     name = raw_input('Plese enter name of file: ')
     name = name + '.jpg'
-    flipCode = 0
     if webcam.isOpened():
         (mainCam, frame) = webcam.read()
     else:
         mainCam = False
+        print 'Webcam not found, please try a different Index number.'
+        WebcamConfig(padding, check)
 
     while mainCam:
         cv2.imshow('Face Crop', frame)
@@ -181,7 +180,7 @@ def Webcam(webcam, padding, boxScale):
             cv2.imwrite(name, frame)
             print 'Image saved'
             cv2.destroyWindow('Face Crop')
-            WebCrop(name, padding, boxScale)
+            WebCrop(name, padding)
 
         # get next frame
         (mainCam, frame) = webcam.read()
@@ -189,16 +188,15 @@ def Webcam(webcam, padding, boxScale):
         if key in [27, ord('Q'), ord('q')]:  # exit on ESC
             break
 
-def start(webcam, padding, boxScale):
-    print 'Option 1: Detect image from Webcam'
-    print 'Option 2: Crop saved images'
-    option = int(raw_input('Please enter 1 or 2: '))
+print 'Option 1: Detect image from Webcam'
+print 'Option 2: Crop saved images'
+option = int(raw_input('Please enter 1 or 2: '))
 
-    if option == 1:
-        Webcam(webcam, padding, boxScale)
-    elif option == 2:
-        CropSetup(padding, boxScale)
-    else:
-        print 'Not a valid input'
-
-start(webcam, padding, boxScale)
+if option == 1:
+    check = True
+    WebcamConfig(padding, check)
+elif option == 2:
+    check = False
+    CropSetup(padding, check)
+else:
+    print 'Not a valid input'
