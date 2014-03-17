@@ -1,9 +1,9 @@
 '''
-Version 2.1.6
+Version 2.1.7
 
-Modified by:
-........-Grady Duncan, @aDroidman
-........
+Created by:
+    -Grady Duncan, @aDroidman
+
 Sources:
 http://stackoverflow.com/questions/13211745/detect-face-then-autocrop-pictures
 https://gist.github.com/astanin/3097851
@@ -17,7 +17,7 @@ import glob
 import os
 import time
 
-print 'Version: 2.1.6'
+print 'Version: 2.1.7'
 
 # Static
 faceCascade = cv.Load('haarcascade_frontalface_alt.xml')
