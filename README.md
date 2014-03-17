@@ -21,4 +21,5 @@ Versions
 2.1 - Correct formatting, removed display copped image, fixed no faces found bug
 
 2.1.6 - Fixed logic issues, added more safeguards to prevent random closes, updated variable names, created new functions to streamline sections of code
+
 2.1.7 - Name changed to prevent copyright issues.
