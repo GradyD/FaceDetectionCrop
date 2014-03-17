@@ -1,6 +1,6 @@
 FaceDetectionCrop
 ==========
-This is a python script to crop images based facial recognition. It has two options, create from a web cam or from a saved image (jpg or png). OpenCV is being used to detect the facial region and PIP to do the cropping.
+This is a python script to crop images based facial recognition. It has two options, create from a web cam or from a saved image (jpg or png). OpenCV is being used to detect the facial region and PIL to do the cropping.
 
 Pyinstaller is being used to compile the script into a runnable EXE. Currently you must have the HaarCascade in the same directory for the script to run. A runnable EXE can be found the release section of this project.
 
