@@ -21,3 +21,5 @@ Versions
 * 2.1.6 - Fixed logic issues, added more safeguards to prevent random closes, updated variable names, created new functions to streamline sections of code
 
 * 2.1.7 - Name changed to prevent copyright issues.
+
+* 2.6 - Lots of logic changes and fixes, updated more variable names, removed functions and cleaned up code to simplify script.
